@@ -300,6 +300,20 @@ CLASS ycl_aai_rest_data_element_mcp IMPLEMENTATION.
 
   METHOD yif_aai_rest_resource~delete.
 
+    DATA(l_name) = to_upper( condense( i_o_request->get_form_field( name = 'name' ) ) ).
+
+    DATA(l_transport_request) = to_upper( condense( i_o_request->get_form_field( name = 'transport_request' ) ) ).
+
+    DATA(l_response) = NEW ycl_aai_fc_data_element_tools( )->delete( i_data_element_name = CONV #( l_name )
+                                                                     i_transport_request = CONV #( l_transport_request ) ).
+
+    i_o_response->set_content_type( content_type = 'text/plain' ).
+
+    i_o_response->set_cdata(
+      EXPORTING
+        data = l_response
+    ).
+
   ENDMETHOD.
 
 ENDCLASS.
