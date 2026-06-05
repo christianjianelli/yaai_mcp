@@ -5,8 +5,6 @@ CLASS ycl_aai_rest_transport_mcp DEFINITION INHERITING FROM ycl_aai_rest_base
 
   PUBLIC SECTION.
 
-    INTERFACES if_oo_adt_classrun.
-
     TYPES: BEGIN OF ty_request_create_s,
              category    TYPE yde_aai_fc_transp_req_categ,
              description TYPE as4text,
@@ -29,10 +27,6 @@ ENDCLASS.
 
 
 CLASS ycl_aai_rest_transport_mcp IMPLEMENTATION.
-
-  METHOD if_oo_adt_classrun~main.
-
-  ENDMETHOD.
 
   METHOD yif_aai_rest_resource~create.
 

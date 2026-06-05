@@ -326,7 +326,6 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
         data = l_response
     ).
 
-
   ENDMETHOD.
 
   METHOD yif_aai_rest_resource~delete.
