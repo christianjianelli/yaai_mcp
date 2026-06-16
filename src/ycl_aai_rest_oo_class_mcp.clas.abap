@@ -5,7 +5,25 @@ CLASS ycl_aai_rest_oo_class_mcp DEFINITION INHERITING FROM ycl_aai_rest_base
 
   PUBLIC SECTION.
 
+    TYPES: BEGIN OF ty_class_create_s,
+             name              TYPE yde_aai_class_name,
+             short_description TYPE as4text,
+             transport_request TYPE yde_aai_fc_transport_request,
+             package           TYPE packname,
+           END OF ty_class_create_s,
+
+           BEGIN OF ty_class_update_s,
+             name              TYPE yde_aai_class_name,
+             short_description TYPE as4text,
+             transport_request TYPE yde_aai_fc_transport_request,
+             source_code       TYPE string,
+           END OF ty_class_update_s.
+
+    METHODS yif_aai_rest_resource~create REDEFINITION.
+
     METHODS yif_aai_rest_resource~read REDEFINITION.
+
+    METHODS yif_aai_rest_resource~update REDEFINITION.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -14,6 +32,46 @@ ENDCLASS.
 
 
 CLASS ycl_aai_rest_oo_class_mcp IMPLEMENTATION.
+
+  METHOD yif_aai_rest_resource~create.
+
+    DATA ls_request TYPE ty_class_create_s.
+
+    DATA(l_body) = i_o_request->get_cdata( ).
+
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json        = l_body
+        pretty_name = /ui2/cl_json=>pretty_mode-camel_case
+      CHANGING
+        data        = ls_request
+    ).
+
+    IF ls_request IS INITIAL.
+
+      i_o_response->set_status(
+        EXPORTING
+          code   = '400'
+          reason = 'Empty or invalid payload received'
+      ).
+
+      RETURN.
+
+    ENDIF.
+
+    DATA(l_response) = NEW ycl_aai_fc_oo_class_tools( )->create( i_class_name        = ls_request-name
+                                                                 i_short_description = ls_request-short_description
+                                                                 i_transport_request = ls_request-transport_request
+                                                                 i_package           = ls_request-package ).
+
+    i_o_response->set_content_type( content_type = 'text/plain' ).
+
+    i_o_response->set_cdata(
+      EXPORTING
+        data = l_response
+    ).
+
+  ENDMETHOD.
 
   METHOD yif_aai_rest_resource~read.
 
@@ -24,6 +82,10 @@ CLASS ycl_aai_rest_oo_class_mcp IMPLEMENTATION.
 
     DATA(l_name) = to_upper( condense( i_o_request->get_form_field( name = 'name' ) ) ).
 
+    DATA(l_package) = to_upper( condense( i_o_request->get_form_field( name = 'package' ) ) ).
+
+    DATA(l_description) = to_upper( condense( i_o_request->get_form_field( name = 'description' ) ) ).
+
     DATA(l_path_info) = i_o_request->get_header_field( name = '~path_info' ).
 
     SHIFT l_path_info LEFT BY 1 PLACES.
@@ -33,13 +95,23 @@ CLASS ycl_aai_rest_oo_class_mcp IMPLEMENTATION.
     IF lines( lt_path_info ) > 1.
 
       "The second URL parameter is expected to be the action identifier
-      l_action = to_upper( lt_path_info[ 2 ] ).
+      l_action = to_upper( condense( lt_path_info[ 2 ] ) ).
 
     ENDIF.
 
     IF l_action IS INITIAL.
 
-      l_response = NEW ycl_aai_fc_oo_class_tools( )->read( i_class_name = CONV #( l_name ) ).
+      IF l_package IS INITIAL.
+
+        l_response = NEW ycl_aai_fc_oo_class_tools( )->read( i_class_name = CONV #( l_name ) ).
+
+      ELSE.
+
+        l_response = NEW ycl_aai_fc_oo_class_tools( )->search( i_package           = CONV #( l_package )
+                                                               i_class_name        = CONV #( l_name )
+                                                               i_short_description = CONV #( l_description ) ).
+
+      ENDIF.
 
     ENDIF.
 
@@ -47,9 +119,53 @@ CLASS ycl_aai_rest_oo_class_mcp IMPLEMENTATION.
 
       WHEN 'CHECK'.
 
+        l_response = NEW ycl_aai_fc_oo_class_tools( )->check_syntax( i_class_name = CONV #( l_name ) ).
 
+      WHEN 'ACTIVATE'.
+
+        l_response = NEW ycl_aai_fc_oo_class_tools( )->activate( i_class_name = CONV #( l_name ) ).
 
     ENDCASE.
+
+    i_o_response->set_content_type( content_type = 'text/plain' ).
+
+    i_o_response->set_cdata(
+      EXPORTING
+        data = l_response
+    ).
+
+  ENDMETHOD.
+
+  METHOD yif_aai_rest_resource~update.
+
+    DATA ls_request TYPE ty_class_update_s.
+
+    DATA(l_body) = i_o_request->get_cdata( ).
+
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json        = l_body
+        pretty_name = /ui2/cl_json=>pretty_mode-camel_case
+      CHANGING
+        data        = ls_request
+    ).
+
+    IF ls_request IS INITIAL.
+
+      i_o_response->set_status(
+        EXPORTING
+          code   = '400'
+          reason = 'Empty or invalid payload received'
+      ).
+
+      RETURN.
+
+    ENDIF.
+
+    DATA(l_response) = NEW ycl_aai_fc_oo_class_tools( )->update( i_class_name        = ls_request-name
+                                                                 i_short_description = ls_request-short_description
+                                                                 i_transport_request = ls_request-transport_request
+                                                                 i_source            = ls_request-source_code ).
 
     i_o_response->set_content_type( content_type = 'text/plain' ).
 
