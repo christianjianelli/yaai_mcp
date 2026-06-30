@@ -43,14 +43,6 @@ CLASS ycl_aai_rest_func_module_mcp IMPLEMENTATION.
 
     ENDIF.
 
-    CASE l_action.
-
-      WHEN 'CHECK'.
-
-
-
-    ENDCASE.
-
     i_o_response->set_content_type( content_type = 'text/plain' ).
 
     i_o_response->set_cdata(

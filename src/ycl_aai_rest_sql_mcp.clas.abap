@@ -44,22 +44,22 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
     SELECT sign, opti AS option, low, high
       FROM tvarvc
-      WHERE name = 'MCP_SQL_READ_WHITELIST'
+      WHERE name = 'YAAI_MCP_SQL_INSERT_WHITELIST'
       INTO CORRESPONDING FIELDS OF TABLE @me->_insert_whitelist.
 
     SELECT sign, opti AS option, low, high
       FROM tvarvc
-      WHERE name = 'MCP_SQL_INSERT_WHITELIST'
+      WHERE name = 'YAAI_MCP_SQL_READ_WHITELIST'
       INTO CORRESPONDING FIELDS OF TABLE @me->_read_whitelist.
 
     SELECT sign, opti AS option, low, high
       FROM tvarvc
-      WHERE name = 'MCP_SQL_UPDATE_WHITELIST'
+      WHERE name = 'YAAI_MCP_SQL_UPDATE_WHITELIST'
       INTO CORRESPONDING FIELDS OF TABLE @me->_update_whitelist.
 
     SELECT sign, opti AS option, low, high
       FROM tvarvc
-      WHERE name = 'MCP_SQL_DELETE_WHITELIST'
+      WHERE name = 'YAAI_MCP_SQL_DELETE_WHITELIST'
       INTO CORRESPONDING FIELDS OF TABLE @me->_delete_whitelist.
 
   ENDMETHOD.
@@ -79,7 +79,7 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
       i_o_response->set_status(
         EXPORTING
-          code   = '400'
+          code   = '403'
           reason = |You are not authorized to insert entries into table { l_table }.|
       ).
 
@@ -109,7 +109,7 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
         i_o_response->set_status(
           EXPORTING
-            code   = '400'
+            code   = '500'
             reason = 'Tool execution failed.'
         ).
 
@@ -127,7 +127,7 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
         i_o_response->set_status(
           EXPORTING
-            code   = '400'
+            code   = '500'
             reason = 'Tool execution failed.'
         ).
 
@@ -168,7 +168,7 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
         i_o_response->set_status(
           EXPORTING
-            code   = '400'
+            code   = '500'
             reason = |Error. 0 records inserted.|
         ).
 
@@ -202,7 +202,7 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
       i_o_response->set_status(
         EXPORTING
-          code   = '400'
+          code   = '403'
           reason = |You are not authorized to read entries from table { l_table }.|
       ).
 
@@ -218,7 +218,7 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
         i_o_response->set_status(
           EXPORTING
-            code   = '400'
+            code   = '500'
             reason = 'Tool execution failed.'
         ).
 
@@ -236,7 +236,7 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
         i_o_response->set_status(
           EXPORTING
-            code   = '400'
+            code   = '500'
             reason = 'Tool execution failed.'
         ).
 
@@ -252,7 +252,7 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
         i_o_response->set_status(
           EXPORTING
-            code   = '400'
+            code   = '500'
             reason = 'Tool execution failed.'
         ).
 
@@ -289,7 +289,7 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
       i_o_response->set_status(
         EXPORTING
-          code   = '400'
+          code   = '403'
           reason = |You are not authorized to update entries in table { l_table }.|
       ).
 
@@ -311,7 +311,7 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
         i_o_response->set_status(
           EXPORTING
-            code   = '400'
+            code   = '500'
             reason = 'Tool execution failed.'
         ).
 
@@ -340,7 +340,7 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
       i_o_response->set_status(
         EXPORTING
-          code   = '400'
+          code   = '403'
           reason = |You are not authorized to delete entries from table { l_table }.|
       ).
 
@@ -362,7 +362,7 @@ CLASS ycl_aai_rest_sql_mcp IMPLEMENTATION.
 
         i_o_response->set_status(
           EXPORTING
-            code   = '400'
+            code   = '500'
             reason = 'Tool execution failed.'
         ).
 
