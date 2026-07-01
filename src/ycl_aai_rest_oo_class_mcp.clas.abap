@@ -5,19 +5,19 @@ CLASS ycl_aai_rest_oo_class_mcp DEFINITION INHERITING FROM ycl_aai_rest_base
 
   PUBLIC SECTION.
 
-    TYPES: BEGIN OF ty_class_create_s,
+    TYPES: BEGIN OF ty_request_create_s,
              name              TYPE yde_aai_class_name,
              short_description TYPE as4text,
              transport_request TYPE yde_aai_fc_transport_request,
              package           TYPE packname,
-           END OF ty_class_create_s,
+           END OF ty_request_create_s,
 
-           BEGIN OF ty_class_update_s,
+           BEGIN OF ty_request_update_s,
              name              TYPE yde_aai_class_name,
              short_description TYPE as4text,
              transport_request TYPE yde_aai_fc_transport_request,
              source_code       TYPE string,
-           END OF ty_class_update_s.
+           END OF ty_request_update_s.
 
     METHODS yif_aai_rest_resource~create REDEFINITION.
 
@@ -35,7 +35,7 @@ CLASS ycl_aai_rest_oo_class_mcp IMPLEMENTATION.
 
   METHOD yif_aai_rest_resource~create.
 
-    DATA ls_request TYPE ty_class_create_s.
+    DATA ls_request TYPE ty_request_create_s.
 
     DATA(l_body) = i_o_request->get_cdata( ).
 
@@ -84,7 +84,7 @@ CLASS ycl_aai_rest_oo_class_mcp IMPLEMENTATION.
 
     DATA(l_package) = to_upper( condense( i_o_request->get_form_field( name = 'package' ) ) ).
 
-    DATA(l_description) = to_upper( condense( i_o_request->get_form_field( name = 'description' ) ) ).
+    DATA(l_description) = i_o_request->get_form_field( name = 'description' ).
 
     DATA(l_path_info) = i_o_request->get_header_field( name = '~path_info' ).
 
@@ -138,7 +138,7 @@ CLASS ycl_aai_rest_oo_class_mcp IMPLEMENTATION.
 
   METHOD yif_aai_rest_resource~update.
 
-    DATA ls_request TYPE ty_class_update_s.
+    DATA ls_request TYPE ty_request_update_s.
 
     DATA(l_body) = i_o_request->get_cdata( ).
 
