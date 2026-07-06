@@ -103,6 +103,8 @@ CLASS ycl_aai_rest_message_mcp IMPLEMENTATION.
 
       l_response = |Unknown language { l_language }.|.
 
+      i_o_response->set_content_type( content_type = 'text/plain' ).
+
       i_o_response->set_cdata(
         EXPORTING
           data = l_response
@@ -121,6 +123,8 @@ CLASS ycl_aai_rest_message_mcp IMPLEMENTATION.
 
       l_response = |Message class { l_message_class } not found.|.
 
+      i_o_response->set_content_type( content_type = 'text/plain' ).
+
       i_o_response->set_cdata(
         EXPORTING
           data = l_response
@@ -133,6 +137,8 @@ CLASS ycl_aai_rest_message_mcp IMPLEMENTATION.
     IF NOT l_message_number CO '0123456789'.
 
       l_response = |Invalid message number { l_message_number }. Expected: 000 to 999|.
+
+      i_o_response->set_content_type( content_type = 'text/plain' ).
 
       i_o_response->set_cdata(
         EXPORTING
@@ -153,6 +159,13 @@ CLASS ycl_aai_rest_message_mcp IMPLEMENTATION.
                                                                         i_message_number    = CONV #( l_message_number )
                                                                         i_language          = l_spras ).
     ENDIF.
+
+    i_o_response->set_content_type( content_type = 'text/plain' ).
+
+    i_o_response->set_cdata(
+      EXPORTING
+        data = l_response
+    ).
 
   ENDMETHOD.
 
@@ -175,30 +188,7 @@ CLASS ycl_aai_rest_message_mcp IMPLEMENTATION.
 
     IF ls_request IS INITIAL.
 
-      i_o_response->set_status(
-        EXPORTING
-          code   = '400'
-          reason = 'Empty or invalid payload received'
-      ).
-
-      RETURN.
-
-    ENDIF.
-
-    i_o_response->set_content_type( content_type = 'text/plain' ).
-
-    CALL FUNCTION 'CONVERSION_EXIT_ISOLA_INPUT'
-      EXPORTING
-        input            = ls_request-language
-      IMPORTING
-        output           = l_spras
-      EXCEPTIONS
-        unknown_language = 1
-        OTHERS           = 2.
-
-    IF sy-subrc <> 0.
-
-      l_response = |Unknown language { ls_request-language }.|.
+      i_o_response->set_content_type( content_type = 'text/plain' ).
 
       i_o_response->set_cdata(
         EXPORTING
@@ -218,12 +208,44 @@ CLASS ycl_aai_rest_message_mcp IMPLEMENTATION.
 
       l_response = |Message class { ls_request-message_class } not found.|.
 
+      i_o_response->set_content_type( content_type = 'text/plain' ).
+
       i_o_response->set_cdata(
         EXPORTING
           data = l_response
       ).
 
       RETURN.
+
+    ENDIF.
+
+    l_spras = ls_t100a-masterlang.
+
+    IF ls_request-language IS NOT INITIAL.
+
+      CALL FUNCTION 'CONVERSION_EXIT_ISOLA_INPUT'
+        EXPORTING
+          input            = ls_request-language
+        IMPORTING
+          output           = l_spras
+        EXCEPTIONS
+          unknown_language = 1
+          OTHERS           = 2.
+
+      IF sy-subrc <> 0.
+
+        l_response = |Unknown language { ls_request-language }.|.
+
+        i_o_response->set_content_type( content_type = 'text/plain' ).
+
+        i_o_response->set_cdata(
+          EXPORTING
+            data = l_response
+        ).
+
+        RETURN.
+
+      ENDIF.
 
     ENDIF.
 
@@ -242,6 +264,8 @@ CLASS ycl_aai_rest_message_mcp IMPLEMENTATION.
                                                                            i_message_text      = ls_request-message_text ).
 
     ENDIF.
+
+    i_o_response->set_content_type( content_type = 'text/plain' ).
 
     i_o_response->set_cdata(
       EXPORTING
@@ -264,6 +288,8 @@ CLASS ycl_aai_rest_message_mcp IMPLEMENTATION.
 
       l_response = |Invalid message number { l_message_number }. Expected: 000 to 999|.
 
+      i_o_response->set_content_type( content_type = 'text/plain' ).
+
       i_o_response->set_cdata(
         EXPORTING
           data = l_response
@@ -276,6 +302,13 @@ CLASS ycl_aai_rest_message_mcp IMPLEMENTATION.
     l_response = NEW ycl_aai_fc_message_class_tools( )->delete_message( i_message_class     = CONV #( l_message_class )
                                                                         i_message_number    = CONV #( l_message_number )
                                                                         i_transport_request = CONV #( l_transport_request ) ).
+
+    i_o_response->set_content_type( content_type = 'text/plain' ).
+
+    i_o_response->set_cdata(
+      EXPORTING
+        data = l_response
+    ).
 
   ENDMETHOD.
 

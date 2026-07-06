@@ -117,6 +117,13 @@ CLASS ycl_aai_rest_message_class_mcp IMPLEMENTATION.
 
     ENDIF.
 
+    i_o_response->set_content_type( content_type = 'text/plain' ).
+
+    i_o_response->set_cdata(
+      EXPORTING
+        data = l_response
+    ).
+
   ENDMETHOD.
 
   METHOD yif_aai_rest_resource~update.
