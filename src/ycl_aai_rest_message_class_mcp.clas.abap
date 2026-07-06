@@ -1,4 +1,4 @@
-CLASS ycl_aai_rest_func_module_mcp DEFINITION INHERITING FROM ycl_aai_rest_base
+CLASS ycl_aai_rest_message_class_mcp DEFINITION INHERITING FROM ycl_aai_rest_base
   PUBLIC
   FINAL
   CREATE PUBLIC .
@@ -6,21 +6,22 @@ CLASS ycl_aai_rest_func_module_mcp DEFINITION INHERITING FROM ycl_aai_rest_base
   PUBLIC SECTION.
 
     TYPES: BEGIN OF ty_request_create_s,
-             name              TYPE rs38l_fnam,
-             function_group    TYPE rs38l_area,
+             name              TYPE yde_aai_fc_message_class,
              short_description TYPE as4text,
+             package           TYPE packname,
              transport_request TYPE yde_aai_fc_transport_request,
            END OF ty_request_create_s,
 
            BEGIN OF ty_request_update_s,
-             name              TYPE rs38l_fnam,
+             name              TYPE yde_aai_fc_message_class,
              short_description TYPE as4text,
              transport_request TYPE yde_aai_fc_transport_request,
-             source_code       TYPE string,
            END OF ty_request_update_s.
 
     METHODS yif_aai_rest_resource~create REDEFINITION.
+
     METHODS yif_aai_rest_resource~read REDEFINITION.
+
     METHODS yif_aai_rest_resource~update REDEFINITION.
 
   PROTECTED SECTION.
@@ -29,11 +30,13 @@ ENDCLASS.
 
 
 
-CLASS ycl_aai_rest_func_module_mcp IMPLEMENTATION.
+CLASS ycl_aai_rest_message_class_mcp IMPLEMENTATION.
 
   METHOD yif_aai_rest_resource~create.
 
     DATA ls_request TYPE ty_request_create_s.
+
+    DATA l_response TYPE string.
 
     DATA(l_body) = i_o_request->get_cdata( ).
 
@@ -57,10 +60,10 @@ CLASS ycl_aai_rest_func_module_mcp IMPLEMENTATION.
 
     ENDIF.
 
-    DATA(l_response) = NEW ycl_aai_fc_func_module_tools( )->create( i_function_module   = ls_request-name
-                                                                    i_function_group    = ls_request-function_group
-                                                                    i_short_description = ls_request-short_description
-                                                                    i_transport_request = ls_request-transport_request ).
+    l_response = NEW ycl_aai_fc_message_class_tools( )->create( i_message_class     = ls_request-name
+                                                                i_description       = ls_request-short_description
+                                                                i_package           = ls_request-package
+                                                                i_transport_request = ls_request-transport_request ).
 
     i_o_response->set_content_type( content_type = 'text/plain' ).
 
@@ -76,13 +79,8 @@ CLASS ycl_aai_rest_func_module_mcp IMPLEMENTATION.
     DATA lt_path_info TYPE string_table.
 
     DATA: l_action   TYPE string,
-          l_response TYPE string.
-
-    DATA(l_name) = to_upper( condense( i_o_request->get_form_field( name = 'name' ) ) ).
-
-    DATA(l_package) = to_upper( condense( i_o_request->get_form_field( name = 'package' ) ) ).
-
-    DATA(l_description) = i_o_request->get_form_field( name = 'description' ).
+          l_response TYPE string,
+          l_spras    TYPE spras.
 
     DATA(l_path_info) = i_o_request->get_header_field( name = '~path_info' ).
 
@@ -97,45 +95,35 @@ CLASS ycl_aai_rest_func_module_mcp IMPLEMENTATION.
 
     ENDIF.
 
+    DATA(l_name) = to_upper( condense( i_o_request->get_form_field( name = 'name' ) ) ).
+
+    DATA(l_package) = to_upper( condense( i_o_request->get_form_field( name = 'package' ) ) ).
+
+    DATA(l_description) = i_o_request->get_form_field( name = 'description' ).
+
     IF l_action IS INITIAL.
 
       IF l_package IS INITIAL.
 
-        l_response = NEW ycl_aai_fc_func_module_tools( )->read( i_function_module = CONV #( l_name ) ).
+        l_response = NEW ycl_aai_fc_message_class_tools( )->read( i_message_class = CONV #( l_name ) ).
 
       ELSE.
 
-        l_response = NEW ycl_aai_fc_func_module_tools( )->search( i_package           = CONV #( l_package )
-                                                                  i_function_module   = CONV #( l_name )
-                                                                  i_short_description = CONV #( l_description ) ).
+        l_response = NEW ycl_aai_fc_message_class_tools( )->search( i_package = CONV #( l_package )
+                                                                    i_message_class = CONV #( l_name )
+                                                                    i_short_description = CONV #( l_description ) ).
+
       ENDIF.
 
     ENDIF.
-
-    CASE l_action.
-
-      WHEN 'CHECK'.
-
-        l_response = NEW ycl_aai_fc_func_module_tools( )->check_syntax( i_function_module = CONV #( l_name ) ).
-
-      WHEN 'ACTIVATE'.
-
-        l_response = NEW ycl_aai_fc_func_module_tools( )->activate( i_function_module = CONV #( l_name ) ).
-
-    ENDCASE.
-
-    i_o_response->set_content_type( content_type = 'text/plain' ).
-
-    i_o_response->set_cdata(
-      EXPORTING
-        data = l_response
-    ).
 
   ENDMETHOD.
 
   METHOD yif_aai_rest_resource~update.
 
     DATA ls_request TYPE ty_request_update_s.
+
+    DATA l_response TYPE string.
 
     DATA(l_body) = i_o_request->get_cdata( ).
 
@@ -159,10 +147,9 @@ CLASS ycl_aai_rest_func_module_mcp IMPLEMENTATION.
 
     ENDIF.
 
-    DATA(l_response) = NEW ycl_aai_fc_func_module_tools( )->update( i_function_module   = ls_request-name
-                                                                    i_short_description = ls_request-short_description
-                                                                    i_transport_request = ls_request-transport_request
-                                                                    i_source            = ls_request-source_code ).
+    l_response = NEW ycl_aai_fc_message_class_tools( )->update( i_message_class     = ls_request-name
+                                                                i_description       = ls_request-short_description
+                                                                i_transport_request = ls_request-transport_request ).
 
     i_o_response->set_content_type( content_type = 'text/plain' ).
 
