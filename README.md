@@ -35,13 +35,7 @@ This library is part of the [ABAP AI tools](https://github.com/christianjianelli
 
 - **SQL**
   - Perform SELECT, INSERT, UPDATE and DELETE statements on the SAP system
-
-### Transport Management
-
-- **Transport Requests**
-  - Create workbench and customizing requests
-  - Search and read transport request details
-
+  
 ### ABAP Coding
 
 - **ABAP Class**
@@ -50,12 +44,28 @@ This library is part of the [ABAP AI tools](https://github.com/christianjianelli
 - **ABAP Interface**
   - Read, search, create, update, check, activate ABAP Interfaces
 
+- **ABAP Function Group**
+  - Read, search, create, update, check, activate ABAP function groups
+
 - **ABAP Function Module**
-  - Read ABAP function module source code
+  - Read, search, create, update, check, activate ABAP function modules
 
 - **ABAP Program/Include** 
-  - Read ABAP program/include source code
+  - Read, search, create, update, check, activate ABAP programs and includes
 
+### Transport Management
+
+- **Transport Requests**
+  - Create workbench and customizing requests
+  - Search and read transport request details
+
+### Messages and Message Classes
+
+- **Message Classes**
+  - Read, search, create, update message classes
+
+- **Messages**
+  - Read, create, update, translate, delete messages
 
 ## Installation
 
