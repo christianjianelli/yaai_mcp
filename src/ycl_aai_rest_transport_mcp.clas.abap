@@ -100,6 +100,9 @@ CLASS ycl_aai_rest_transport_mcp IMPLEMENTATION.
                                                   THEN abap_true
                                                   ELSE abap_false ).
 
+    DATA(l_object_type) = to_upper( condense( i_o_request->get_form_field( name = 'object_type' ) ) ).
+    DATA(l_object_name) = to_upper( condense( i_o_request->get_form_field( name = 'object_name' ) ) ).
+
 
     DATA(l_path_info) = i_o_request->get_header_field( name = '~path_info' ).
 
@@ -130,6 +133,13 @@ CLASS ycl_aai_rest_transport_mcp IMPLEMENTATION.
                                                                 i_customizing         = l_customizing
                                                                 i_transport_of_copies = l_transport_of_copies
                                                                 i_description         = CONV #( l_description ) ).
+
+      WHEN 'GET_CURRENT_TRANSPORT_REQUEST'.
+
+        l_response = NEW ycl_aai_fc_transport_tools( )->get_current_transport_request(
+                                                       i_object_type = CONV #( l_object_type )
+                                                       i_object_name = CONV #( l_object_name )
+                                                     ).
 
     ENDCASE.
 
